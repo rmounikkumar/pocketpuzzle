@@ -308,10 +308,14 @@ async function main(): Promise<void> {
   });
 
   buildBoard(ui, DIFFICULTY_SIZE[state.difficulty]);
-  bindInput(state);
   syncModeUi(state);
   newGame(state);
-  void ads.init();
+
+  root.classList.add('reveal');
+  setTimeout(() => {
+    bindInput(state);
+    void ads.init();
+  }, 700);
 }
 
 main();
