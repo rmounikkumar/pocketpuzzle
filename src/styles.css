@@ -804,14 +804,12 @@ button:disabled {
 /* ── Leaderboard overlay ── */
 
 .leaderboard-overlay {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  z-index: 50;
+  z-index: 200;
   background: rgba(15, 18, 32, 0.92);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: var(--radius);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -824,7 +822,8 @@ button:disabled {
 .leaderboard-panel {
   text-align: center;
   width: 100%;
-  max-height: 100%;
+  max-width: 400px;
+  max-height: 80vh;
   padding: 20px 16px;
   display: flex;
   flex-direction: column;
@@ -838,6 +837,41 @@ button:disabled {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+.username-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  justify-content: center;
+}
+
+.username-label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.username-input {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.85rem;
+  padding: 6px 10px;
+  width: 140px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.username-input:focus {
+  border-color: var(--accent);
+}
+
+.username-input::placeholder {
+  color: rgba(139, 145, 181, 0.4);
 }
 
 .leaderboard-list {
@@ -878,10 +912,18 @@ button:disabled {
   min-width: 56px;
 }
 
-.lb-meta {
-  color: var(--muted);
+.lb-name {
+  color: var(--text);
+  font-weight: 600;
   flex: 1;
   text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lb-meta {
+  color: var(--muted);
   font-size: 0.78rem;
 }
 

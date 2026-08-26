@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getLeaderboard, addScore, clearLeaderboard, isHighScore } from './leaderboard';
+import { getLeaderboard, addScore, clearLeaderboard, isHighScore, getUsername, setUsername } from './leaderboard';
 
 describe('leaderboard storage', () => {
   it('starts empty', () => {
@@ -89,6 +89,34 @@ describe('leaderboard storage', () => {
       expect(isHighScore(101)).toBe(true);
       expect(isHighScore(100)).toBe(false);
       expect(isHighScore(50)).toBe(false);
+    } finally {
+      Object.defineProperty(globalThis, 'localStorage', { value: orig, writable: true, configurable: true });
+    }
+  });
+});
+
+describe('username storage', () => {
+  it('returns empty string by default', () => {
+    expect(getUsername()).toBe('');
+  });
+
+  it('setUsername and getUsername roundtrip', () => {
+    const store: Record<string, string> = {};
+    const mock = {
+      getItem: (k: string) => store[k] ?? null,
+      setItem: (k: string, v: string) => { store[k] = v; },
+      removeItem: (k: string) => { delete store[k]; }
+    };
+    const orig = globalThis.localStorage;
+    Object.defineProperty(globalThis, 'localStorage', { value: mock, writable: true, configurable: true });
+
+    try {
+      setUsername('Krish');
+      expect(getUsername()).toBe('Krish');
+      setUsername('  trimmed  ');
+      expect(getUsername()).toBe('trimmed');
+      setUsername('');
+      expect(getUsername()).toBe('');
     } finally {
       Object.defineProperty(globalThis, 'localStorage', { value: orig, writable: true, configurable: true });
     }

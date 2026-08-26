@@ -16,7 +16,7 @@ import { sound } from './core/audio';
 import { initAnalytics, trackEvent } from './core/analytics';
 import { suggestHint, hintLabel } from './core/hints';
 import { dailyNumber, localDateKey, mulberry32, seedFromKey } from './core/rng';
-import { addScore, getLeaderboard } from './core/leaderboard';
+import { addScore, getLeaderboard, getUsername, setUsername } from './core/leaderboard';
 import {
   loadClassicBest,
   loadDailyBest,
@@ -87,7 +87,7 @@ function saveScoreFor(state: GameState): void {
 
 function recordScore(state: GameState): void {
   if (state.scoreRecorded || state.score <= 0) return;
-  addScore({ score: state.score, difficulty: state.difficulty, mode: state.mode, date: localDateKey() });
+  addScore({ score: state.score, difficulty: state.difficulty, mode: state.mode, date: localDateKey(), player: getUsername() || 'Player' });
   state.scoreRecorded = true;
   trackEvent('score_recorded', { score: state.score, mode: state.mode, difficulty: state.difficulty });
 }
@@ -350,6 +350,7 @@ async function main(): Promise<void> {
   }
 
   ui.leaderboardBtnEl.addEventListener('click', () => {
+    ui.usernameInputEl.value = getUsername();
     refreshLeaderboard();
     ui.leaderboardOverlayEl.classList.remove('hidden');
   });
@@ -358,6 +359,15 @@ async function main(): Promise<void> {
   });
   ui.leaderboardOverlayEl.addEventListener('click', (e) => {
     if (e.target === ui.leaderboardOverlayEl) ui.leaderboardOverlayEl.classList.add('hidden');
+  });
+
+  ui.usernameInputEl.value = getUsername();
+  ui.usernameInputEl.addEventListener('input', () => {
+    setUsername(ui.usernameInputEl.value);
+  });
+
+  window.addEventListener('beforeunload', () => {
+    recordScore(state);
   });
 
   buildBoard(ui, DIFFICULTY_SIZE[state.difficulty]);

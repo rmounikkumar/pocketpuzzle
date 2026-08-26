@@ -7,37 +7,49 @@ export interface LeaderboardEntry {
   mode: GameMode;
   date: string;
   timestamp: number;
+  player?: string;
 }
 
 const STORAGE_KEY = 'pocketpuzzle_leaderboard';
+const USERNAME_KEY = 'pocketpuzzle_username';
 const MAX_ENTRIES = 20;
 
-function safeGet(): string | null {
+function safeGet(key: string): string | null {
   try {
-    return localStorage.getItem(STORAGE_KEY);
+    return localStorage.getItem(key);
   } catch {
     return null;
   }
 }
 
-function safeSet(val: string): void {
+function safeSet(key: string, val: string): void {
   try {
-    localStorage.setItem(STORAGE_KEY, val);
+    localStorage.setItem(key, val);
   } catch {
     // silent
   }
 }
 
-function safeRemove(): void {
+function safeRemove(key: string): void {
   try {
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(key);
   } catch {
     // silent
   }
+}
+
+export function getUsername(): string {
+  return safeGet(USERNAME_KEY) ?? '';
+}
+
+export function setUsername(name: string): void {
+  const trimmed = name.trim().slice(0, 20);
+  if (trimmed) safeSet(USERNAME_KEY, trimmed);
+  else safeRemove(USERNAME_KEY);
 }
 
 export function getLeaderboard(): LeaderboardEntry[] {
-  const raw = safeGet();
+  const raw = safeGet(STORAGE_KEY);
   if (!raw) return [];
   try {
     return JSON.parse(raw) as LeaderboardEntry[];
@@ -50,11 +62,11 @@ export function addScore(entry: Omit<LeaderboardEntry, 'timestamp'>): void {
   const board = getLeaderboard();
   board.push({ ...entry, timestamp: Date.now() });
   board.sort((a, b) => b.score - a.score);
-  safeSet(JSON.stringify(board.slice(0, MAX_ENTRIES)));
+  safeSet(STORAGE_KEY, JSON.stringify(board.slice(0, MAX_ENTRIES)));
 }
 
 export function clearLeaderboard(): void {
-  safeRemove();
+  safeRemove(STORAGE_KEY);
 }
 
 export function isHighScore(score: number): boolean {

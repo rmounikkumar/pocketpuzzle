@@ -36,6 +36,7 @@ export interface UiHandles {
   leaderboardOverlayEl: HTMLElement;
   leaderboardListEl: HTMLElement;
   leaderboardCloseEl: HTMLElement;
+  usernameInputEl: HTMLInputElement;
 }
 
 const TILE_VALUES = [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048];
@@ -78,13 +79,6 @@ export function mountUi(root: HTMLElement): UiHandles {
           <button id="overlay-button" type="button">New Game</button>
         </div>
       </div>
-      <div id="leaderboard-overlay" class="leaderboard-overlay hidden">
-        <div class="leaderboard-panel">
-          <h2 class="leaderboard-title">Leaderboard</h2>
-          <div id="leaderboard-list" class="leaderboard-list"></div>
-          <button id="leaderboard-close" type="button" class="btn-secondary">Close</button>
-        </div>
-      </div>
     </div>
     <div id="hint-msg" class="hint-msg hidden"></div>
     <footer class="controls">
@@ -94,7 +88,18 @@ export function mountUi(root: HTMLElement): UiHandles {
         <button id="sound-toggle" type="button" class="btn-secondary">Sound: On</button>
       </div>
       <p class="hint">Arrow keys / WASD / swipe &middot; <a href="./privacy.html">Privacy</a></p>
-    </footer>`;
+    </footer>
+    <div id="leaderboard-overlay" class="leaderboard-overlay hidden">
+      <div class="leaderboard-panel">
+        <h2 class="leaderboard-title">Leaderboard</h2>
+        <div class="username-row">
+          <label for="username-input" class="username-label">Your name:</label>
+          <input id="username-input" type="text" class="username-input" placeholder="Player" maxlength="20" />
+        </div>
+        <div id="leaderboard-list" class="leaderboard-list"></div>
+        <button id="leaderboard-close" type="button" class="btn-secondary">Close</button>
+      </div>
+    </div>`;
 
   return {
     scoreBoxEl: document.getElementById('score')?.parentElement as HTMLElement,
@@ -118,7 +123,8 @@ export function mountUi(root: HTMLElement): UiHandles {
     leaderboardBtnEl: document.getElementById('leaderboard-btn') as HTMLElement,
     leaderboardOverlayEl: document.getElementById('leaderboard-overlay') as HTMLElement,
     leaderboardListEl: document.getElementById('leaderboard-list') as HTMLElement,
-    leaderboardCloseEl: document.getElementById('leaderboard-close') as HTMLElement
+    leaderboardCloseEl: document.getElementById('leaderboard-close') as HTMLElement,
+    usernameInputEl: document.getElementById('username-input') as HTMLInputElement
   };
 }
 
@@ -246,7 +252,7 @@ export function showNewBest(ui: UiHandles): void {
 
 export function renderLeaderboard(
   listEl: HTMLElement,
-  entries: { score: number; difficulty: string; mode: string; date: string }[]
+  entries: { score: number; difficulty: string; mode: string; date: string; player?: string }[]
 ): void {
   if (entries.length === 0) {
     listEl.innerHTML = '<p class="leaderboard-empty">No scores yet. Play a game!</p>';
@@ -258,6 +264,7 @@ export function renderLeaderboard(
     <div class="leaderboard-entry">
       <span class="lb-rank">${i + 1}</span>
       <span class="lb-score">${e.score.toLocaleString()}</span>
+      <span class="lb-name">${e.player || 'Player'}</span>
       <span class="lb-meta">${e.difficulty} ${e.mode === 'daily' ? 'Daily' : 'Classic'}</span>
       <span class="lb-date">${e.date}</span>
     </div>`
