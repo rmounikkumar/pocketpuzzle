@@ -8,6 +8,121 @@
   --radius: 14px;
 }
 
+/* ── Landing ── */
+
+.landing {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 500ms ease, transform 500ms ease;
+}
+
+.landing--hidden {
+  opacity: 0;
+  transform: scale(1.08);
+  pointer-events: none;
+}
+
+#particle-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.landing-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  animation: landing-in 800ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes landing-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.landing-icon {
+  margin-bottom: 20px;
+  animation: icon-float 4s ease-in-out infinite;
+}
+
+@keyframes icon-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.landing-title {
+  font-size: clamp(2.8rem, 10vw, 4.5rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  background: linear-gradient(135deg, #e8eaf6 30%, var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 0 32px rgba(245, 158, 11, 0.25));
+}
+
+.landing-subtitle {
+  color: var(--muted);
+  font-size: clamp(1rem, 3vw, 1.3rem);
+  font-weight: 400;
+  margin-bottom: 36px;
+}
+
+.play-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--accent), #fbbf24);
+  color: #1e1b4b;
+  border: none;
+  border-radius: 16px;
+  padding: 16px 52px;
+  font-size: 1.15rem;
+  font-weight: 800;
+  font-family: inherit;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  box-shadow:
+    0 4px 24px rgba(245, 158, 11, 0.4),
+    0 0 60px rgba(245, 158, 11, 0.12);
+  transition: transform 150ms ease, box-shadow 200ms ease;
+}
+
+.play-btn:hover {
+  transform: scale(1.05);
+  box-shadow:
+    0 6px 32px rgba(245, 158, 11, 0.55),
+    0 0 80px rgba(245, 158, 11, 0.2);
+}
+
+.play-btn:active {
+  transform: scale(0.97);
+}
+
+.landing-footer {
+  margin-top: 28px;
+  color: rgba(139, 145, 181, 0.6);
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-content { animation: none; }
+  .landing-icon { animation: none; }
+  .landing { transition: none; }
+}
+
 * {
   box-sizing: border-box;
   margin: 0;

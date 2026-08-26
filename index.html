@@ -16,9 +16,31 @@
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
-    <title>PocketPuzzle</title>
+    <title>PocketPuzzle - Free Puzzle Game</title>
   </head>
   <body>
+    <div id="landing" class="landing">
+      <canvas id="particle-canvas"></canvas>
+      <div class="landing-content">
+        <div class="landing-icon">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+            <rect x="4" y="4" width="26" height="26" rx="6" fill="#f59e0b" opacity="0.9"/>
+            <rect x="34" y="4" width="26" height="26" rx="6" fill="#fbbf24" opacity="0.7"/>
+            <rect x="4" y="34" width="26" height="26" rx="6" fill="#fbbf24" opacity="0.7"/>
+            <rect x="34" y="34" width="26" height="26" rx="6" fill="#f59e0b" opacity="0.5"/>
+            <text x="17" y="22" text-anchor="middle" fill="#1e1b4b" font-family="Inter" font-weight="900" font-size="14">2</text>
+            <text x="47" y="22" text-anchor="middle" fill="#1e1b4b" font-family="Inter" font-weight="900" font-size="14">4</text>
+            <text x="17" y="52" text-anchor="middle" fill="#1e1b4b" font-family="Inter" font-weight="900" font-size="14">8</text>
+            <text x="47" y="52" text-anchor="middle" fill="#1e1b4b" font-family="Inter" font-weight="900" font-size="14">16</text>
+          </svg>
+        </div>
+        <h1 class="landing-title">PocketPuzzle</h1>
+        <p class="landing-subtitle">Swipe. Merge. Reach 2048.</p>
+        <button id="play-btn" type="button" class="play-btn">Play Now</button>
+        <p class="landing-footer">Free to play &bull; No install needed</p>
+      </div>
+    </div>
+
     <div id="ad-top" class="ad-slot" aria-hidden="true"></div>
     <main id="app"></main>
     <div id="ad-bottom" class="ad-slot" aria-hidden="true"></div>

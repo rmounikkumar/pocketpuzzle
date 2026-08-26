@@ -1,4 +1,5 @@
 import './styles.css';
+import { initLanding } from './landing';
 import { ads } from './ads/adBridge';
 import {
   DIFFICULTY_SIZE,
@@ -249,7 +250,9 @@ function bindInput(state: GameState): void {
   });
 }
 
-function main(): void {
+async function main(): Promise<void> {
+  await initLanding();
+
   initAnalytics();
   const root = document.getElementById('app') as HTMLElement;
   ui = mountUi(root);
