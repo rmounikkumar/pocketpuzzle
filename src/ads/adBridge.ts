@@ -10,7 +10,7 @@ export class NullAdProvider implements AdProvider {
   async init(): Promise<void> {}
   async showInterstitial(): Promise<void> {}
   async showRewarded(): Promise<boolean> {
-    return false;
+    return true;
   }
 }
 
