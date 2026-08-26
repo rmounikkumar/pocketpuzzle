@@ -14,7 +14,9 @@ import {
 } from './core/board';
 import { sound } from './core/audio';
 import { initAnalytics, trackEvent } from './core/analytics';
+import { suggestHint, hintLabel } from './core/hints';
 import { dailyNumber, localDateKey, mulberry32, seedFromKey } from './core/rng';
+import { addScore, getLeaderboard } from './core/leaderboard';
 import {
   loadClassicBest,
   loadDailyBest,
@@ -31,6 +33,7 @@ import {
   celebrate,
   mountUi,
   render,
+  renderLeaderboard,
   setDifficultyUi,
   setModeUi,
   shakeBoard,
@@ -146,6 +149,7 @@ async function copyResult(state: GameState): Promise<boolean> {
 }
 
 function newGame(state: GameState): void {
+  ui.hintMsgEl.classList.add('hidden');
   state.grid = emptyGrid(DIFFICULTY_SIZE[state.difficulty]);
   spawnTile(state.grid, state.rng);
   spawnTile(state.grid, state.rng);
@@ -161,6 +165,7 @@ function newGame(state: GameState): void {
 
 function tryMove(state: GameState, dir: Direction): void {
   if (state.over) return;
+  ui.hintMsgEl.classList.add('hidden');
   const result = move(state.grid, dir);
   if (!result.moved) {
     shakeBoard(ui);
@@ -205,6 +210,7 @@ function tryMove(state: GameState, dir: Direction): void {
     state.over = true;
     sound.lose();
     trackEvent('game_over', { score: state.score, mode: state.mode, difficulty: state.difficulty });
+    addScore({ score: state.score, difficulty: state.difficulty, mode: state.mode, date: localDateKey() });
     void ads.showInterstitial();
   }
   draw(state, { merged: result.merged, spawned });
@@ -305,6 +311,40 @@ async function main(): Promise<void> {
   ui.soundBtnEl.addEventListener('click', () => {
     sound.setMuted(!sound.isMuted());
     syncSoundLabel();
+  });
+
+  let hintTimer = 0;
+  ui.hintBtnEl.addEventListener('click', async () => {
+    if (state.over) return;
+    window.clearTimeout(hintTimer);
+    ui.hintBtnEl.textContent = 'Watching ad...';
+    ui.hintBtnEl.setAttribute('disabled', 'true');
+    const rewarded = await ads.showRewarded();
+    ui.hintBtnEl.removeAttribute('disabled');
+    ui.hintBtnEl.textContent = 'Hint';
+    if (!rewarded) return;
+    const dir = suggestHint(state.grid);
+    ui.hintMsgEl.textContent = hintLabel(dir);
+    ui.hintMsgEl.classList.remove('hidden');
+    trackEvent('hint_used', { score: state.score, mode: state.mode, difficulty: state.difficulty });
+    hintTimer = window.setTimeout(() => {
+      ui.hintMsgEl.classList.add('hidden');
+    }, 4000);
+  });
+
+  function refreshLeaderboard(): void {
+    renderLeaderboard(ui.leaderboardListEl, getLeaderboard());
+  }
+
+  ui.leaderboardBtnEl.addEventListener('click', () => {
+    refreshLeaderboard();
+    ui.leaderboardOverlayEl.classList.remove('hidden');
+  });
+  ui.leaderboardCloseEl.addEventListener('click', () => {
+    ui.leaderboardOverlayEl.classList.add('hidden');
+  });
+  ui.leaderboardOverlayEl.addEventListener('click', (e) => {
+    if (e.target === ui.leaderboardOverlayEl) ui.leaderboardOverlayEl.classList.add('hidden');
   });
 
   buildBoard(ui, DIFFICULTY_SIZE[state.difficulty]);

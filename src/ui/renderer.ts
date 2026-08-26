@@ -30,6 +30,12 @@ export interface UiHandles {
   continueBtnEl: HTMLElement;
   copyBtnEl: HTMLElement;
   soundBtnEl: HTMLElement;
+  hintBtnEl: HTMLElement;
+  hintMsgEl: HTMLElement;
+  leaderboardBtnEl: HTMLElement;
+  leaderboardOverlayEl: HTMLElement;
+  leaderboardListEl: HTMLElement;
+  leaderboardCloseEl: HTMLElement;
 }
 
 const TILE_VALUES = [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048];
@@ -42,7 +48,10 @@ export function mountUi(root: HTMLElement): UiHandles {
   root.innerHTML = `
     <header class="hud">
       <div class="brand">
-        <h1>PocketPuzzle</h1>
+        <div class="brand-row">
+          <h1>PocketPuzzle</h1>
+          <button id="leaderboard-btn" type="button" class="icon-btn" title="Leaderboard">&#127942;</button>
+        </div>
         <p id="mode-label" class="tagline"></p>
       </div>
       <div class="scores">
@@ -69,20 +78,27 @@ export function mountUi(root: HTMLElement): UiHandles {
           <button id="overlay-button" type="button">New Game</button>
         </div>
       </div>
+      <div id="leaderboard-overlay" class="leaderboard-overlay hidden">
+        <div class="leaderboard-panel">
+          <h2 class="leaderboard-title">Leaderboard</h2>
+          <div id="leaderboard-list" class="leaderboard-list"></div>
+          <button id="leaderboard-close" type="button" class="btn-secondary">Close</button>
+        </div>
+      </div>
     </div>
+    <div id="hint-msg" class="hint-msg hidden"></div>
     <footer class="controls">
       <div class="btn-row">
         <button id="new-game" type="button">New Game</button>
+        <button id="hint-btn" type="button" class="btn-secondary">Hint</button>
         <button id="sound-toggle" type="button" class="btn-secondary">Sound: On</button>
       </div>
       <p class="hint">Arrow keys / WASD / swipe &middot; <a href="./privacy.html">Privacy</a></p>
     </footer>`;
 
-  const scoreEl = document.getElementById('score') as HTMLElement;
-
   return {
-    scoreBoxEl: scoreEl.parentElement as HTMLElement,
-    scoreEl,
+    scoreBoxEl: document.getElementById('score')?.parentElement as HTMLElement,
+    scoreEl: document.getElementById('score') as HTMLElement,
     bestEl: document.getElementById('best') as HTMLElement,
     modeClassicEl: document.getElementById('mode-classic') as HTMLElement,
     modeDailyEl: document.getElementById('mode-daily') as HTMLElement,
@@ -96,7 +112,13 @@ export function mountUi(root: HTMLElement): UiHandles {
     overlayButtonEl: document.getElementById('overlay-button') as HTMLElement,
     continueBtnEl: document.getElementById('continue-button') as HTMLElement,
     copyBtnEl: document.getElementById('copy-button') as HTMLElement,
-    soundBtnEl: document.getElementById('sound-toggle') as HTMLElement
+    soundBtnEl: document.getElementById('sound-toggle') as HTMLElement,
+    hintBtnEl: document.getElementById('hint-btn') as HTMLElement,
+    hintMsgEl: document.getElementById('hint-msg') as HTMLElement,
+    leaderboardBtnEl: document.getElementById('leaderboard-btn') as HTMLElement,
+    leaderboardOverlayEl: document.getElementById('leaderboard-overlay') as HTMLElement,
+    leaderboardListEl: document.getElementById('leaderboard-list') as HTMLElement,
+    leaderboardCloseEl: document.getElementById('leaderboard-close') as HTMLElement
   };
 }
 
@@ -220,4 +242,25 @@ export function showNewBest(ui: UiHandles): void {
   el.textContent = 'New Best!';
   box.appendChild(el);
   window.setTimeout(() => el.remove(), 1500);
+}
+
+export function renderLeaderboard(
+  listEl: HTMLElement,
+  entries: { score: number; difficulty: string; mode: string; date: string }[]
+): void {
+  if (entries.length === 0) {
+    listEl.innerHTML = '<p class="leaderboard-empty">No scores yet. Play a game!</p>';
+    return;
+  }
+  listEl.innerHTML = entries
+    .map(
+      (e, i) => `
+    <div class="leaderboard-entry">
+      <span class="lb-rank">${i + 1}</span>
+      <span class="lb-score">${e.score.toLocaleString()}</span>
+      <span class="lb-meta">${e.difficulty} ${e.mode === 'daily' ? 'Daily' : 'Classic'}</span>
+      <span class="lb-date">${e.date}</span>
+    </div>`
+    )
+    .join('');
 }
