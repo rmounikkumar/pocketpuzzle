@@ -57,6 +57,7 @@ interface GameState {
   difficulty: Difficulty;
   dailyDate: string;
   rng: () => number;
+  scoreRecorded: boolean;
 }
 
 let ui: UiHandles;
@@ -82,6 +83,13 @@ function loadBestFor(state: GameState): number {
 function saveScoreFor(state: GameState): void {
   if (state.mode === 'daily') saveDailyBest(state.dailyDate, state.difficulty, state.best);
   else saveClassicBest(state.difficulty, state.best);
+}
+
+function recordScore(state: GameState): void {
+  if (state.scoreRecorded || state.score <= 0) return;
+  addScore({ score: state.score, difficulty: state.difficulty, mode: state.mode, date: localDateKey() });
+  state.scoreRecorded = true;
+  trackEvent('score_recorded', { score: state.score, mode: state.mode, difficulty: state.difficulty });
 }
 
 const DIFFICULTY_LABEL: Record<Difficulty, string> = {
@@ -110,6 +118,7 @@ function syncModeUi(state: GameState): void {
 
 function setMode(state: GameState, mode: GameMode): void {
   if (state.mode === mode) return;
+  recordScore(state);
   state.mode = mode;
   saveMode(mode);
   applyRng(state);
@@ -119,6 +128,7 @@ function setMode(state: GameState, mode: GameMode): void {
 
 function setDifficulty(state: GameState, difficulty: Difficulty): void {
   if (state.difficulty === difficulty) return;
+  recordScore(state);
   state.difficulty = difficulty;
   saveDifficulty(difficulty);
   syncModeUi(state);
@@ -150,6 +160,7 @@ async function copyResult(state: GameState): Promise<boolean> {
 
 function newGame(state: GameState): void {
   ui.hintMsgEl.classList.add('hidden');
+  recordScore(state);
   state.grid = emptyGrid(DIFFICULTY_SIZE[state.difficulty]);
   spawnTile(state.grid, state.rng);
   spawnTile(state.grid, state.rng);
@@ -159,6 +170,7 @@ function newGame(state: GameState): void {
   state.over = false;
   state.bestCelebrated = false;
   state.combo = 0;
+  state.scoreRecorded = false;
   state.best = loadBestFor(state);
   draw(state);
 }
@@ -209,8 +221,8 @@ function tryMove(state: GameState, dir: Direction): void {
   if (!hasMoves(state.grid)) {
     state.over = true;
     sound.lose();
+    recordScore(state);
     trackEvent('game_over', { score: state.score, mode: state.mode, difficulty: state.difficulty });
-    addScore({ score: state.score, difficulty: state.difficulty, mode: state.mode, date: localDateKey() });
     void ads.showInterstitial();
   }
   draw(state, { merged: result.merged, spawned });
@@ -276,7 +288,8 @@ async function main(): Promise<void> {
     mode: initialMode,
     difficulty: loadDifficulty(),
     dailyDate: '',
-    rng: Math.random
+    rng: Math.random,
+    scoreRecorded: false
   };
   applyRng(state);
 
