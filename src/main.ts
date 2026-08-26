@@ -16,7 +16,6 @@ import { sound } from './core/audio';
 import { initAnalytics, trackEvent } from './core/analytics';
 import { suggestHint, hintLabel } from './core/hints';
 import { dailyNumber, localDateKey, mulberry32, seedFromKey } from './core/rng';
-import { addScore, getLeaderboard, getUsername, setUsername } from './core/leaderboard';
 import {
   loadClassicBest,
   loadDailyBest,
@@ -33,7 +32,6 @@ import {
   celebrate,
   mountUi,
   render,
-  renderLeaderboard,
   setDifficultyUi,
   setModeUi,
   shakeBoard,
@@ -57,7 +55,6 @@ interface GameState {
   difficulty: Difficulty;
   dailyDate: string;
   rng: () => number;
-  scoreRecorded: boolean;
 }
 
 let ui: UiHandles;
@@ -83,13 +80,6 @@ function loadBestFor(state: GameState): number {
 function saveScoreFor(state: GameState): void {
   if (state.mode === 'daily') saveDailyBest(state.dailyDate, state.difficulty, state.best);
   else saveClassicBest(state.difficulty, state.best);
-}
-
-function recordScore(state: GameState): void {
-  if (state.scoreRecorded || state.score <= 0) return;
-  addScore({ score: state.score, difficulty: state.difficulty, mode: state.mode, date: localDateKey(), player: getUsername() || 'Player' });
-  state.scoreRecorded = true;
-  trackEvent('score_recorded', { score: state.score, mode: state.mode, difficulty: state.difficulty });
 }
 
 const DIFFICULTY_LABEL: Record<Difficulty, string> = {
@@ -118,7 +108,6 @@ function syncModeUi(state: GameState): void {
 
 function setMode(state: GameState, mode: GameMode): void {
   if (state.mode === mode) return;
-  recordScore(state);
   state.mode = mode;
   saveMode(mode);
   applyRng(state);
@@ -128,7 +117,6 @@ function setMode(state: GameState, mode: GameMode): void {
 
 function setDifficulty(state: GameState, difficulty: Difficulty): void {
   if (state.difficulty === difficulty) return;
-  recordScore(state);
   state.difficulty = difficulty;
   saveDifficulty(difficulty);
   syncModeUi(state);
@@ -160,7 +148,6 @@ async function copyResult(state: GameState): Promise<boolean> {
 
 function newGame(state: GameState): void {
   ui.hintMsgEl.classList.add('hidden');
-  recordScore(state);
   state.grid = emptyGrid(DIFFICULTY_SIZE[state.difficulty]);
   spawnTile(state.grid, state.rng);
   spawnTile(state.grid, state.rng);
@@ -170,7 +157,6 @@ function newGame(state: GameState): void {
   state.over = false;
   state.bestCelebrated = false;
   state.combo = 0;
-  state.scoreRecorded = false;
   state.best = loadBestFor(state);
   draw(state);
 }
@@ -221,7 +207,6 @@ function tryMove(state: GameState, dir: Direction): void {
   if (!hasMoves(state.grid)) {
     state.over = true;
     sound.lose();
-    recordScore(state);
     trackEvent('game_over', { score: state.score, mode: state.mode, difficulty: state.difficulty });
     void ads.showInterstitial();
   }
@@ -288,8 +273,7 @@ async function main(): Promise<void> {
     mode: initialMode,
     difficulty: loadDifficulty(),
     dailyDate: '',
-    rng: Math.random,
-    scoreRecorded: false
+    rng: Math.random
   };
   applyRng(state);
 
@@ -343,31 +327,6 @@ async function main(): Promise<void> {
     hintTimer = window.setTimeout(() => {
       ui.hintMsgEl.classList.add('hidden');
     }, 4000);
-  });
-
-  function refreshLeaderboard(): void {
-    renderLeaderboard(ui.leaderboardListEl, getLeaderboard());
-  }
-
-  ui.leaderboardBtnEl.addEventListener('click', () => {
-    ui.usernameInputEl.value = getUsername();
-    refreshLeaderboard();
-    ui.leaderboardOverlayEl.classList.remove('hidden');
-  });
-  ui.leaderboardCloseEl.addEventListener('click', () => {
-    ui.leaderboardOverlayEl.classList.add('hidden');
-  });
-  ui.leaderboardOverlayEl.addEventListener('click', (e) => {
-    if (e.target === ui.leaderboardOverlayEl) ui.leaderboardOverlayEl.classList.add('hidden');
-  });
-
-  ui.usernameInputEl.value = getUsername();
-  ui.usernameInputEl.addEventListener('input', () => {
-    setUsername(ui.usernameInputEl.value);
-  });
-
-  window.addEventListener('beforeunload', () => {
-    recordScore(state);
   });
 
   buildBoard(ui, DIFFICULTY_SIZE[state.difficulty]);
