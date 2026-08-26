@@ -90,7 +90,7 @@ function Get-FittedFont([string]$text, [int]$maxWidth, [int]$startSize) {
   return New-Object System.Drawing.Font('Segoe UI', 12, [System.Drawing.FontStyle]::Bold)
 }
 
-$titleText = 'PocketPuzzle'
+$titleText = 'ArcPuzzels'
 $titleFont = Get-FittedFont $titleText 480 62
 $titleBrush = New-Object System.Drawing.SolidBrush(Convert-Hex '#E8EAF6')
 $g.DrawString($titleText, $titleFont, $titleBrush, 690, 235)

@@ -125,7 +125,7 @@ function setDifficulty(state: GameState, difficulty: Difficulty): void {
 }
 
 async function copyResult(state: GameState): Promise<boolean> {
-  const text = `PocketPuzzle Daily #${dailyNumber(state.dailyDate)} (${state.dailyDate}, ${DIFFICULTY_LABEL[state.difficulty]}) - score ${state.score}`;
+  const text = `ArcPuzzels Daily #${dailyNumber(state.dailyDate)} (${state.dailyDate}, ${DIFFICULTY_LABEL[state.difficulty]}) - score ${state.score}`;
   try {
     await navigator.clipboard.writeText(text);
     return true;

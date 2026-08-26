@@ -1,11 +1,11 @@
 import type { Difficulty } from './board';
 
-const BEST_KEY = 'pocketpuzzle.best';
-const CLASSIC_PREFIX = 'pocketpuzzle.best.classic.';
-const MUTED_KEY = 'pocketpuzzle.muted';
-const MODE_KEY = 'pocketpuzzle.mode';
-const DIFFICULTY_KEY = 'pocketpuzzle.difficulty';
-const DAILY_KEY = 'pocketpuzzle.daily';
+const BEST_KEY = 'arcpuzzels.best';
+const CLASSIC_PREFIX = 'arcpuzzels.best.classic.';
+const MUTED_KEY = 'arcpuzzels.muted';
+const MODE_KEY = 'arcpuzzels.mode';
+const DIFFICULTY_KEY = 'arcpuzzels.difficulty';
+const DAILY_KEY = 'arcpuzzels.daily';
 const DAILY_KEEP = 30;
 
 export type GameMode = 'classic' | 'daily';

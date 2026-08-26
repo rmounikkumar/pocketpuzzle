@@ -45,7 +45,7 @@ export function mountUi(root: HTMLElement): UiHandles {
     <header class="hud">
       <div class="brand">
         <div class="brand-row">
-          <h1>PocketPuzzle</h1>
+          <h1>ArcPuzzels</h1>
         </div>
         <p id="mode-label" class="tagline"></p>
       </div>

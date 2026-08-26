@@ -1,4 +1,4 @@
-# PocketPuzzle — End-to-End Plan (Zero Cost, Ad-Funded)
+# ArcPuzzels — End-to-End Plan (Zero Cost, Ad-Funded)
 
 Goal: ship a polished free web puzzle game that generates pocket money from ads, with $0 spent.
 
@@ -16,7 +16,7 @@ Translation: one decent puzzle game with modest traffic = coffee money. Three to
 
 ## 2. The product
 
-**Game:** 2048-style merge puzzle ("PocketPuzzle" is a placeholder — pick an ASO-friendly name before launch: short, unique, searchable).
+**Game:** 2048-style merge puzzle ("ArcPuzzels" is a placeholder — pick an ASO-friendly name before launch: short, unique, searchable).
 Why this first: ~300 lines of core logic, no art pipeline needed (tiles are colored numbers), proven retention, and it's the fastest path to your first dollar. Variants/twists differentiate you from the thousands of clones.
 
 Ideas for the twist (pick ONE): daily challenge seed (Wordle-style "everyone gets the same board"), undo-limited mode with rewarded-ad continue, or a themed skin system.

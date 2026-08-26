@@ -11,8 +11,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg'],
       manifest: {
-        name: 'PocketPuzzle',
-        short_name: 'PocketPuzzle',
+        name: 'ArcPuzzels',
+        short_name: 'ArcPuzzels',
         description: 'A free merge puzzle game. Swipe, merge, beat your best.',
         start_url: '.',
         scope: '.',
